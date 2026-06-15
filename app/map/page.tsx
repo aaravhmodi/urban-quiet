@@ -15,8 +15,8 @@ import MapFilters, {
 const NoiseMap = dynamic(() => import("@/components/map/NoiseMap"), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full flex items-center justify-center bg-slate-800 text-slate-400">
-      Loading map...
+    <div className="w-full h-full flex items-center justify-center bg-[oklch(0.962_0.003_248)] text-[oklch(0.62_0.006_248)] text-[15px]">
+      Loading map…
     </div>
   ),
 });
@@ -51,8 +51,7 @@ export default function MapPage() {
   const filteredSamples = useMemo(() => {
     return samples.filter((s) => {
       if (!filters.categories.includes(s.soundCategory)) return false;
-      if (s.loudnessScore < filters.loudnessMin || s.loudnessScore > filters.loudnessMax)
-        return false;
+      if (s.loudnessScore < filters.loudnessMin || s.loudnessScore > filters.loudnessMax) return false;
       if (!matchesTimeOfDay(s, filters.timeOfDay)) return false;
       return true;
     });
@@ -65,19 +64,20 @@ export default function MapPage() {
   }, [filteredSamples, filters.zoneType]);
 
   return (
-    <div className="flex-1 flex flex-col lg:flex-row h-[calc(100vh-56px)]">
-      {/* Sidebar — desktop */}
-      <div className="lg:w-72 lg:overflow-y-auto lg:border-r lg:border-slate-800 p-4 flex-shrink-0">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-white font-semibold">Noise Map</h2>
-          <span className="text-xs text-slate-400">{filteredSamples.length} samples</span>
+    <div className="flex-1 flex flex-col lg:flex-row h-[calc(100vh-48px)]">
+      {/* Sidebar */}
+      <div className="lg:w-72 lg:overflow-y-auto border-b lg:border-b-0 lg:border-r border-[oklch(0.88_0.004_248)] bg-white p-4 flex-shrink-0">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-[17px] font-semibold text-[oklch(0.12_0.006_248)]">Noise Map</h2>
+          <span className="text-[13px] text-[oklch(0.62_0.006_248)]">
+            {loading ? "Loading…" : `${filteredSamples.length} samples`}
+          </span>
         </div>
 
-        {loading && (
-          <div className="text-slate-400 text-sm py-4">Loading samples...</div>
-        )}
         {error && (
-          <div className="text-red-400 text-sm py-2">{error}</div>
+          <div className="text-[oklch(0.46_0.22_25)] text-[13px] mb-3 bg-[oklch(0.97_0.01_25)] border border-[oklch(0.85_0.06_25)] rounded-[10px] px-3 py-2">
+            {error}
+          </div>
         )}
 
         <MapFilters filters={filters} setFilters={setFilters} />
@@ -90,7 +90,8 @@ export default function MapPage() {
         {/* FAB */}
         <Link
           href="/record"
-          className="absolute bottom-6 right-6 z-[999] w-14 h-14 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center text-white text-2xl shadow-xl transition-colors"
+          className="absolute bottom-6 right-6 z-[999] w-14 h-14 rounded-full flex items-center justify-center text-white text-3xl shadow-lg shadow-[oklch(0.56_0.12_188/0.35)] transition-opacity active:opacity-80"
+          style={{ background: "oklch(0.56 0.12 188)" }}
           aria-label="Add recording"
         >
           +

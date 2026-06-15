@@ -4,19 +4,35 @@ import { useEffect, useState, useMemo } from "react";
 import { getSamples } from "@/lib/supabase";
 import { computeZones } from "@/lib/zones";
 import { NoiseSample, SoundCategory } from "@/types";
-import { Card } from "@/components/ui/card";
 
-const CATEGORY_EMOJIS: Record<SoundCategory, string> = {
-  traffic: "🚗",
-  construction: "🏗️",
-  siren: "🚨",
-  crowd: "👥",
-  music: "🎵",
-  nature: "🌿",
-  indoor: "🏠",
-  quiet: "🤫",
-  unknown: "❓",
+const CATEGORY_LABELS: Record<SoundCategory, string> = {
+  traffic: "Traffic",
+  construction: "Construction",
+  siren: "Siren",
+  crowd: "Crowd",
+  music: "Music",
+  nature: "Nature",
+  indoor: "Indoor",
+  quiet: "Quiet",
+  unknown: "Unknown",
 };
+
+function StatCard({ value, label }: { value: number; label: string }) {
+  return (
+    <div className="bg-white rounded-[16px] border border-[oklch(0.88_0.004_248)] p-5">
+      <div className="text-[34px] font-bold text-[oklch(0.12_0.006_248)] leading-none">{value}</div>
+      <div className="text-[13px] text-[oklch(0.48_0.008_248)] mt-1.5">{label}</div>
+    </div>
+  );
+}
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="text-[13px] font-medium text-[oklch(0.48_0.008_248)] uppercase tracking-wider px-1">
+      {children}
+    </div>
+  );
+}
 
 export default function InsightsPage() {
   const [samples, setSamples] = useState<NoiseSample[]>([]);
@@ -31,26 +47,19 @@ export default function InsightsPage() {
   }, []);
 
   const zones = useMemo(() => computeZones(samples), [samples]);
-
   const quietestZones = useMemo(
     () => [...zones].sort((a, b) => a.avgLoudnessScore - b.avgLoudnessScore).slice(0, 3),
     [zones]
   );
-
   const noisestZones = useMemo(
     () => [...zones].sort((a, b) => b.avgLoudnessScore - a.avgLoudnessScore).slice(0, 3),
     [zones]
   );
-
   const categoryBreakdown = useMemo(() => {
     const counts: Partial<Record<SoundCategory, number>> = {};
-    for (const s of samples) {
-      counts[s.soundCategory] = (counts[s.soundCategory] ?? 0) + 1;
-    }
-    return Object.entries(counts)
-      .sort(([, a], [, b]) => (b as number) - (a as number)) as [SoundCategory, number][];
+    for (const s of samples) counts[s.soundCategory] = (counts[s.soundCategory] ?? 0) + 1;
+    return Object.entries(counts).sort(([, a], [, b]) => (b as number) - (a as number)) as [SoundCategory, number][];
   }, [samples]);
-
   const hourlyAvg = useMemo(() => {
     const sums = new Array(24).fill(0);
     const counts = new Array(24).fill(0);
@@ -61,164 +70,162 @@ export default function InsightsPage() {
     }
     return sums.map((sum, h) => (counts[h] > 0 ? sum / counts[h] : 0));
   }, [samples]);
-
   const maxHourlyAvg = Math.max(...hourlyAvg, 1);
   const maxCategoryCount = Math.max(...categoryBreakdown.map(([, c]) => c), 1);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center flex-1 text-slate-400">
-        Loading insights...
+      <div className="flex items-center justify-center flex-1 gap-3 text-[oklch(0.48_0.008_248)]">
+        <div className="w-5 h-5 rounded-full border-2 border-[oklch(0.88_0.004_248)] border-t-[oklch(0.56_0.12_188)] animate-spin" />
+        <span className="text-[15px]">Loading insights…</span>
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto w-full px-4 py-8 flex flex-col gap-6">
-      <h1 className="text-2xl font-bold text-white">Insights</h1>
+    <div className="max-w-2xl mx-auto w-full px-4 py-6 flex flex-col gap-6">
+      <div>
+        <h1 className="text-[28px] font-bold text-[oklch(0.12_0.006_248)] tracking-tight">Insights</h1>
+        <p className="text-[15px] text-[oklch(0.48_0.008_248)] mt-1">City noise at a glance.</p>
+      </div>
 
       {error && (
-        <div className="bg-red-900/50 border border-red-700 text-red-300 rounded-xl px-4 py-3 text-sm">
+        <div className="bg-[oklch(0.97_0.01_25)] border border-[oklch(0.85_0.06_25)] text-[oklch(0.46_0.22_25)] rounded-[12px] px-4 py-3 text-[14px]">
           {error}
         </div>
       )}
 
-      {/* Summary cards */}
+      {/* Stats */}
       <div className="grid grid-cols-2 gap-3">
-        <Card className="bg-slate-800 border-slate-700 p-4">
-          <div className="text-3xl font-bold text-white">{samples.length}</div>
-          <div className="text-slate-400 text-sm mt-1">Total Samples</div>
-        </Card>
-        <Card className="bg-slate-800 border-slate-700 p-4">
-          <div className="text-3xl font-bold text-white">{zones.length}</div>
-          <div className="text-slate-400 text-sm mt-1">Mapped Zones</div>
-        </Card>
+        <StatCard value={samples.length} label="Total Samples" />
+        <StatCard value={zones.length} label="Mapped Zones" />
       </div>
 
       {/* Quietest zones */}
-      <Card className="bg-slate-800 border-slate-700 p-4">
-        <h2 className="text-white font-semibold mb-3 flex items-center gap-2">
-          <span>🤫</span> Quietest Zones
-        </h2>
-        {quietestZones.length === 0 ? (
-          <p className="text-slate-500 text-sm">No zones yet (need 3+ samples per area)</p>
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-slate-500 text-xs">
-                <th className="text-left pb-2">Location</th>
-                <th className="text-right pb-2">Avg Score</th>
-                <th className="text-right pb-2">Samples</th>
-              </tr>
-            </thead>
-            <tbody>
-              {quietestZones.map((z) => (
-                <tr key={z.cellId} className="border-t border-slate-700">
-                  <td className="py-2 text-slate-300">{z.cellId}</td>
-                  <td className="py-2 text-right text-green-400 font-mono">
-                    {z.avgLoudnessScore.toFixed(1)}
-                  </td>
-                  <td className="py-2 text-right text-slate-400">{z.sampleCount}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </Card>
+      <div className="flex flex-col gap-2">
+        <SectionTitle>Quietest Zones</SectionTitle>
+        <div className="bg-white rounded-[16px] border border-[oklch(0.88_0.004_248)] overflow-hidden">
+          {quietestZones.length === 0 ? (
+            <div className="px-4 py-5 text-[14px] text-[oklch(0.62_0.006_248)]">
+              No zones yet — need 3+ samples per area.
+            </div>
+          ) : (
+            quietestZones.map((z, i) => (
+              <div
+                key={z.cellId}
+                className={`flex items-center justify-between px-4 py-3.5 ${i > 0 ? "border-t border-[oklch(0.92_0.004_248)]" : ""}`}
+              >
+                <div>
+                  <div className="text-[15px] font-medium text-[oklch(0.12_0.006_248)]">{z.cellId}</div>
+                  <div className="text-[12px] text-[oklch(0.62_0.006_248)]">{z.sampleCount} samples</div>
+                </div>
+                <div className="text-[17px] font-semibold text-[oklch(0.46_0.14_152)] font-mono">
+                  {z.avgLoudnessScore.toFixed(0)}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
 
       {/* Noisiest zones */}
-      <Card className="bg-slate-800 border-slate-700 p-4">
-        <h2 className="text-white font-semibold mb-3 flex items-center gap-2">
-          <span>📢</span> Noisiest Zones
-        </h2>
-        {noisestZones.length === 0 ? (
-          <p className="text-slate-500 text-sm">No zones yet</p>
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-slate-500 text-xs">
-                <th className="text-left pb-2">Location</th>
-                <th className="text-right pb-2">Avg Score</th>
-                <th className="text-right pb-2">Samples</th>
-              </tr>
-            </thead>
-            <tbody>
-              {noisestZones.map((z) => (
-                <tr key={z.cellId} className="border-t border-slate-700">
-                  <td className="py-2 text-slate-300">{z.cellId}</td>
-                  <td className="py-2 text-right text-red-400 font-mono">
-                    {z.avgLoudnessScore.toFixed(1)}
-                  </td>
-                  <td className="py-2 text-right text-slate-400">{z.sampleCount}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </Card>
+      <div className="flex flex-col gap-2">
+        <SectionTitle>Noisiest Zones</SectionTitle>
+        <div className="bg-white rounded-[16px] border border-[oklch(0.88_0.004_248)] overflow-hidden">
+          {noisestZones.length === 0 ? (
+            <div className="px-4 py-5 text-[14px] text-[oklch(0.62_0.006_248)]">No zones yet.</div>
+          ) : (
+            noisestZones.map((z, i) => (
+              <div
+                key={z.cellId}
+                className={`flex items-center justify-between px-4 py-3.5 ${i > 0 ? "border-t border-[oklch(0.92_0.004_248)]" : ""}`}
+              >
+                <div>
+                  <div className="text-[15px] font-medium text-[oklch(0.12_0.006_248)]">{z.cellId}</div>
+                  <div className="text-[12px] text-[oklch(0.62_0.006_248)]">{z.sampleCount} samples</div>
+                </div>
+                <div className="text-[17px] font-semibold text-[oklch(0.46_0.22_25)] font-mono">
+                  {z.avgLoudnessScore.toFixed(0)}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
 
       {/* Category breakdown */}
-      <Card className="bg-slate-800 border-slate-700 p-4">
-        <h2 className="text-white font-semibold mb-4">Sound Category Breakdown</h2>
-        {categoryBreakdown.length === 0 ? (
-          <p className="text-slate-500 text-sm">No data yet</p>
-        ) : (
-          <div className="flex flex-col gap-2">
-            {categoryBreakdown.map(([cat, count]) => (
-              <div key={cat} className="flex items-center gap-2">
-                <span className="w-20 text-xs text-slate-400 flex items-center gap-1">
-                  <span>{CATEGORY_EMOJIS[cat]}</span>
-                  <span className="capitalize truncate">{cat}</span>
-                </span>
-                <div className="flex-1 h-5 bg-slate-700 rounded-full overflow-hidden">
+      <div className="flex flex-col gap-2">
+        <SectionTitle>Sound Categories</SectionTitle>
+        <div className="bg-white rounded-[16px] border border-[oklch(0.88_0.004_248)] p-4">
+          {categoryBreakdown.length === 0 ? (
+            <div className="text-[14px] text-[oklch(0.62_0.006_248)] py-2">No data yet.</div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {categoryBreakdown.map(([cat, count]) => (
+                <div key={cat} className="flex items-center gap-3">
+                  <span className="w-[90px] text-[13px] text-[oklch(0.30_0.008_248)] font-medium capitalize flex-shrink-0">
+                    {CATEGORY_LABELS[cat]}
+                  </span>
+                  <div className="flex-1 h-2 bg-[oklch(0.94_0.004_248)] rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all"
+                      style={{
+                        width: `${(count / maxCategoryCount) * 100}%`,
+                        background: "oklch(0.56 0.12 188)",
+                      }}
+                    />
+                  </div>
+                  <span className="w-6 text-right text-[12px] text-[oklch(0.62_0.006_248)] font-mono flex-shrink-0">
+                    {count}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Hourly chart */}
+      <div className="flex flex-col gap-2">
+        <SectionTitle>Average Loudness by Hour</SectionTitle>
+        <div className="bg-white rounded-[16px] border border-[oklch(0.88_0.004_248)] p-4">
+          <div className="flex items-end gap-[2px] h-20">
+            {hourlyAvg.map((avg, h) => {
+              const heightPct = (avg / maxHourlyAvg) * 100;
+              const barColor =
+                avg === 0
+                  ? "oklch(0.94 0.004 248)"
+                  : avg < 35
+                  ? "oklch(0.58 0.14 152)"
+                  : avg <= 65
+                  ? "oklch(0.72 0.17 72)"
+                  : "oklch(0.56 0.22 25)";
+              return (
+                <div
+                  key={h}
+                  className="flex-1 flex flex-col justify-end"
+                  title={`${h}:00 — ${avg > 0 ? avg.toFixed(1) : "no data"}`}
+                >
                   <div
-                    className="h-full bg-blue-500 rounded-full transition-all"
-                    style={{ width: `${(count / maxCategoryCount) * 100}%` }}
+                    className="w-full rounded-t-[2px] transition-all"
+                    style={{
+                      height: `${Math.max(heightPct, avg > 0 ? 4 : 0)}%`,
+                      background: barColor,
+                    }}
                   />
                 </div>
-                <span className="w-8 text-right text-xs text-slate-400">{count}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
-        )}
-      </Card>
-
-      {/* Average loudness by hour */}
-      <Card className="bg-slate-800 border-slate-700 p-4">
-        <h2 className="text-white font-semibold mb-4">Average Loudness by Hour</h2>
-        <div className="flex items-end gap-0.5 h-24">
-          {hourlyAvg.map((avg, h) => {
-            const heightPct = maxHourlyAvg > 0 ? (avg / maxHourlyAvg) * 100 : 0;
-            const color =
-              avg === 0
-                ? "bg-slate-700"
-                : avg < 35
-                ? "bg-green-500"
-                : avg <= 65
-                ? "bg-yellow-500"
-                : "bg-red-500";
-            return (
-              <div
-                key={h}
-                className="flex-1 flex flex-col items-center justify-end group relative"
-                title={`${h}:00 — ${avg > 0 ? avg.toFixed(1) : "no data"}`}
-              >
-                <div
-                  className={`w-full rounded-t ${color} transition-all`}
-                  style={{ height: `${heightPct}%`, minHeight: avg > 0 ? "2px" : "0" }}
-                />
-              </div>
-            );
-          })}
+          <div className="flex justify-between text-[11px] text-[oklch(0.62_0.006_248)] mt-2">
+            <span>12am</span>
+            <span>6am</span>
+            <span>12pm</span>
+            <span>6pm</span>
+            <span>11pm</span>
+          </div>
         </div>
-        <div className="flex justify-between text-xs text-slate-600 mt-1">
-          <span>12am</span>
-          <span>6am</span>
-          <span>12pm</span>
-          <span>6pm</span>
-          <span>11pm</span>
-        </div>
-      </Card>
+      </div>
     </div>
   );
 }
