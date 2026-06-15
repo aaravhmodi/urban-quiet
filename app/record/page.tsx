@@ -221,18 +221,33 @@ export default function RecordPage() {
                 </svg>
               }
             />
-            <PermissionRow
-              label="Location"
-              granted={locationGranted}
-              onRequest={requestLocation}
-              hasDivider
-              icon={
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                  <path d="M9 2a5 5 0 0 1 5 5c0 3.5-5 9-5 9S4 10.5 4 7a5 5 0 0 1 5-5z" fill={locationGranted ? "oklch(0.58 0.14 152)" : "oklch(0.56 0.12 188)"} fillOpacity="0.8" />
-                  <circle cx="9" cy="7" r="2" fill="white" />
-                </svg>
-              }
-            />
+            {!locationDenied ? (
+              <PermissionRow
+                label="Location"
+                granted={locationGranted}
+                onRequest={requestLocation}
+                hasDivider
+                icon={
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <path d="M9 2a5 5 0 0 1 5 5c0 3.5-5 9-5 9S4 10.5 4 7a5 5 0 0 1 5-5z" fill={locationGranted ? "oklch(0.58 0.14 152)" : "oklch(0.56 0.12 188)"} fillOpacity="0.8" />
+                    <circle cx="9" cy="7" r="2" fill="white" />
+                  </svg>
+                }
+              />
+            ) : (
+              <SectionRow hasDivider>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-[15px] font-medium text-[oklch(0.12_0.006_248)]">Location</div>
+                  <span className="text-[12px] text-[oklch(0.46_0.22_25)] bg-[oklch(0.97_0.01_25)] px-2 py-0.5 rounded-full">
+                    GPS denied — pin manually
+                  </span>
+                </div>
+                <LocationPicker
+                  value={location}
+                  onChange={(loc) => { setLocation(loc); setLocationGranted(true); }}
+                />
+              </SectionRow>
+            )}
           </SectionCard>
           <button
             onClick={() => { if (micGranted && locationGranted) { setError(null); setStep("record"); } }}
