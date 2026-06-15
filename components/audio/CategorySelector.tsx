@@ -7,22 +7,19 @@ interface CategorySelectorProps {
   onChange: (cat: SoundCategory) => void;
 }
 
-const CATEGORIES: { value: SoundCategory; emoji: string; label: string }[] = [
-  { value: "traffic", emoji: "🚗", label: "Traffic" },
-  { value: "construction", emoji: "🏗️", label: "Construction" },
-  { value: "siren", emoji: "🚨", label: "Siren" },
-  { value: "crowd", emoji: "👥", label: "Crowd" },
-  { value: "music", emoji: "🎵", label: "Music" },
-  { value: "nature", emoji: "🌿", label: "Nature" },
-  { value: "indoor", emoji: "🏠", label: "Indoor" },
-  { value: "quiet", emoji: "🤫", label: "Quiet" },
-  { value: "unknown", emoji: "❓", label: "Unknown" },
+const CATEGORIES: { value: SoundCategory; label: string }[] = [
+  { value: "traffic", label: "Traffic" },
+  { value: "construction", label: "Construction" },
+  { value: "siren", label: "Siren" },
+  { value: "crowd", label: "Crowd" },
+  { value: "music", label: "Music" },
+  { value: "nature", label: "Nature" },
+  { value: "indoor", label: "Indoor" },
+  { value: "quiet", label: "Quiet" },
+  { value: "unknown", label: "Unknown" },
 ];
 
-export default function CategorySelector({
-  selected,
-  onChange,
-}: CategorySelectorProps) {
+export default function CategorySelector({ selected, onChange }: CategorySelectorProps) {
   return (
     <div className="grid grid-cols-3 gap-2">
       {CATEGORIES.map((cat) => {
@@ -32,19 +29,16 @@ export default function CategorySelector({
             key={cat.value}
             onClick={() => onChange(cat.value)}
             className={`
-              flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-xl
-              border-2 transition-all min-h-[72px] text-center
+              flex items-center justify-center py-3 px-2 rounded-xl
+              border transition-all min-h-[48px] text-center text-[14px] font-medium
               ${
                 isSelected
-                  ? "border-blue-500 bg-blue-500/20 text-white"
-                  : "border-slate-600 bg-slate-800 text-slate-300 hover:border-slate-400"
+                  ? "border-[oklch(0.56_0.12_188)] bg-[oklch(0.56_0.12_188/0.1)] text-[oklch(0.40_0.12_188)]"
+                  : "border-[oklch(0.88_0.004_248)] bg-white text-[oklch(0.30_0.008_248)] hover:border-[oklch(0.70_0.008_248)] hover:bg-[oklch(0.97_0.004_248)]"
               }
             `}
           >
-            <span className="text-2xl" role="img" aria-label={cat.label}>
-              {cat.emoji}
-            </span>
-            <span className="text-xs font-medium">{cat.label}</span>
+            {cat.label}
           </button>
         );
       })}
