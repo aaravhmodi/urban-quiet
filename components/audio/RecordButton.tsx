@@ -10,10 +10,7 @@ interface RecordButtonProps {
 
 type RecordState = "idle" | "recording" | "done";
 
-export default function RecordButton({
-  onRecordingComplete,
-  duration,
-}: RecordButtonProps) {
+export default function RecordButton({ onRecordingComplete, duration }: RecordButtonProps) {
   const [state, setState] = useState<RecordState>("idle");
   const [countdown, setCountdown] = useState(duration);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -31,24 +28,16 @@ export default function RecordButton({
 
     intervalRef.current = setInterval(() => {
       setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(intervalRef.current!);
-          return 0;
-        }
+        if (prev <= 1) { clearInterval(intervalRef.current!); return 0; }
         return prev - 1;
       });
     }, 1000);
 
     try {
       const blob = await startRecording(duration);
-      if (!cancelledRef.current) {
-        setState("done");
-        onRecordingComplete(blob);
-      }
+      if (!cancelledRef.current) { setState("done"); onRecordingComplete(blob); }
     } catch {
-      if (!cancelledRef.current) {
-        setState("idle");
-      }
+      if (!cancelledRef.current) setState("idle");
     } finally {
       if (intervalRef.current) clearInterval(intervalRef.current);
     }
@@ -66,41 +55,52 @@ export default function RecordButton({
   const isDone = state === "done";
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-5">
       <button
         onClick={handleRecord}
         disabled={isRecording || isDone}
         aria-label={isRecording ? `Recording: ${countdown}s remaining` : "Start recording"}
-        className={`
-          w-24 h-24 rounded-full text-white font-bold text-sm flex flex-col items-center justify-center
-          transition-all duration-200 shadow-lg
-          ${isRecording ? "bg-red-600 scale-110 ring-4 ring-red-400/50" : ""}
-          ${isDone ? "bg-green-600" : ""}
-          ${!isRecording && !isDone ? "bg-red-500 hover:bg-red-600 active:scale-95" : ""}
-        `}
+        className="relative w-28 h-28 rounded-full flex flex-col items-center justify-center transition-all duration-200 disabled:cursor-default"
+        style={{
+          background: isDone
+            ? "oklch(0.58 0.14 152)"
+            : "oklch(0.56 0.22 25)",
+          boxShadow: isRecording
+            ? "0 0 0 8px oklch(0.56 0.22 25 / 0.15), 0 8px 32px oklch(0.56 0.22 25 / 0.35)"
+            : isDone
+            ? "0 8px 24px oklch(0.58 0.14 152 / 0.35)"
+            : "0 8px 24px oklch(0.56 0.22 25 / 0.35)",
+          transform: isRecording ? "scale(1.06)" : "scale(1)",
+        }}
       >
         {isRecording ? (
           <>
-            <span className="text-2xl font-mono">{countdown}</span>
-            <span className="text-xs mt-1">recording</span>
+            <span className="text-[32px] font-semibold text-white font-mono leading-none">{countdown}</span>
+            <span className="text-[11px] text-white/70 mt-1 font-medium uppercase tracking-wider">recording</span>
           </>
         ) : isDone ? (
-          <>
-            <span className="text-xl">✓</span>
-            <span className="text-xs mt-1">Done</span>
-          </>
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <path d="M7 16l7 7 11-13" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
         ) : (
-          <>
-            <span className="text-2xl">🎙</span>
-            <span className="text-xs mt-1">Record</span>
-          </>
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <rect x="13" y="6" width="6" height="14" rx="3" fill="white"/>
+            <path d="M8 17a8 8 0 0 0 16 0" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            <line x1="16" y1="25" x2="16" y2="29" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            <line x1="12" y1="29" x2="20" y2="29" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        )}
+
+        {/* Pulsing ring when recording */}
+        {isRecording && (
+          <span className="absolute inset-0 rounded-full animate-ping opacity-20" style={{ background: "oklch(0.56 0.22 25)" }} />
         )}
       </button>
 
       {isRecording && (
         <button
           onClick={handleCancel}
-          className="px-4 py-2 text-sm text-slate-300 border border-slate-600 rounded-lg hover:bg-slate-700 transition-colors min-h-[44px]"
+          className="px-5 py-2 text-[14px] text-[oklch(0.48_0.008_248)] bg-white border border-[oklch(0.88_0.004_248)] rounded-full hover:bg-[oklch(0.97_0.004_248)] transition-colors min-h-[44px]"
         >
           Cancel
         </button>
