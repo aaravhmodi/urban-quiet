@@ -36,13 +36,13 @@ function zoneColor(zoneType: NoiseZone["zoneType"]): string {
 export default function NoiseMap({ samples, zones }: NoiseMapProps) {
   return (
     <MapContainer
-      center={[43.65, -79.38]}
-      zoom={13}
+      center={[43.4643, -80.5204]}
+      zoom={14}
       className="w-full h-full"
-      style={{ background: "#1e293b" }}
+      style={{ background: "#f0f4f8" }}
     >
       <TileLayer
-        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
       />
 
