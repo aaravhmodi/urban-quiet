@@ -11,6 +11,9 @@ import { submitSample } from "@/lib/supabase";
 import { getTimeBaseline, loudnessVsBaseline } from "@/lib/timeBaseline";
 import { LoudnessResult, SoundCategory } from "@/types";
 import type { ClassificationResult } from "@/lib/yamnet";
+import dynamic from "next/dynamic";
+
+const LocationPicker = dynamic(() => import("@/components/map/LocationPicker"), { ssr: false });
 
 type Step = "permissions" | "record" | "categorize" | "submitting";
 
@@ -73,6 +76,7 @@ export default function RecordPage() {
   const [step, setStep] = useState<Step>("permissions");
   const [micGranted, setMicGranted] = useState(false);
   const [locationGranted, setLocationGranted] = useState(false);
+  const [locationDenied, setLocationDenied] = useState(false);
   const [duration, setDuration] = useState<5 | 10>(5);
   const [isRecording, setIsRecording] = useState(false);
   const [loudnessResult, setLoudnessResult] = useState<LoudnessResult | null>(null);
@@ -112,9 +116,11 @@ export default function RecordPage() {
       const loc = await getCurrentLocation();
       setLocation(loc);
       setLocationGranted(true);
+      setLocationDenied(false);
       setError(null);
     } catch {
-      setError("Location access denied. Please allow location access to tag your recording.");
+      setLocationDenied(true);
+      setError(null);
     }
   }
 
