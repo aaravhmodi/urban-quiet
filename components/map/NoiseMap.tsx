@@ -66,7 +66,6 @@ export default function NoiseMap({ samples, zones }: NoiseMapProps) {
         const radius = 4 + (sample.loudnessScore / 100) * 12;
         const emoji = CATEGORY_EMOJIS[sample.soundCategory] ?? "❓";
 
-        const isSeed = sample.id.startsWith("seed-");
         return (
           <CircleMarker
             key={sample.id}
@@ -75,9 +74,8 @@ export default function NoiseMap({ samples, zones }: NoiseMapProps) {
             pathOptions={{
               color,
               fillColor: color,
-              fillOpacity: isSeed ? 0.35 : 0.7,
-              weight: isSeed ? 1 : 1.5,
-              dashArray: isSeed ? "3 3" : undefined,
+              fillOpacity: 0.7,
+              weight: 1.5,
             }}
           >
             <Popup>
@@ -91,9 +89,6 @@ export default function NoiseMap({ samples, zones }: NoiseMapProps) {
                 </div>
                 {sample.note && (
                   <div className="mt-1 italic text-gray-600">{sample.note}</div>
-                )}
-                {isSeed && (
-                  <div className="mt-1 text-gray-400 text-xs">Seed data</div>
                 )}
               </div>
             </Popup>
