@@ -79,6 +79,7 @@ export default function RecordPage() {
   const [locationDenied, setLocationDenied] = useState(false);
   const [duration, setDuration] = useState<5 | 10>(5);
   const [isRecording, setIsRecording] = useState(false);
+  const [recordedAt, setRecordedAt] = useState<Date | null>(null);
   const [loudnessResult, setLoudnessResult] = useState<LoudnessResult | null>(null);
   const [aiResult, setAiResult] = useState<ClassificationResult | null>(null);
   const [aiLoading, setAiLoading] = useState(false);

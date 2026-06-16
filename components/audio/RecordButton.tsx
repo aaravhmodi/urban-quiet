@@ -5,12 +5,13 @@ import { startRecording, cancelRecording } from "@/lib/audio";
 
 interface RecordButtonProps {
   onRecordingComplete: (blob: Blob) => void;
+  onRecordingStart?: () => void;
   duration: number;
 }
 
 type RecordState = "idle" | "recording" | "done";
 
-export default function RecordButton({ onRecordingComplete, duration }: RecordButtonProps) {
+export default function RecordButton({ onRecordingComplete, onRecordingStart, duration }: RecordButtonProps) {
   const [state, setState] = useState<RecordState>("idle");
   const [countdown, setCountdown] = useState(duration);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
