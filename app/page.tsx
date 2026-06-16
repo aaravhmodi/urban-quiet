@@ -18,11 +18,30 @@ const STEPS = [
   },
 ];
 
+const WHY_CARDS = [
+  {
+    stat: "1 in 5",
+    label: "Canadians exposed to harmful noise levels",
+    detail: "Chronic noise above 65 dB raises cortisol, disrupts sleep, and is linked to heart disease — even when you tune it out.",
+  },
+  {
+    stat: "Outdated",
+    label: "Most city noise maps are years old",
+    detail: "Government surveys happen every 5–10 years. Construction starts tomorrow. A new bar opens next month. Static maps miss all of it.",
+  },
+  {
+    stat: "Real-time",
+    label: "Crowdsourced data reflects what's happening now",
+    detail: "Every recording you submit makes the map more accurate for students, commuters, parents, and researchers trying to find quiet.",
+  },
+];
+
 export default function HomePage() {
   return (
     <div className="flex flex-col items-center flex-1 px-5">
+
       {/* Hero */}
-      <div className="flex flex-col items-center text-center pt-16 pb-10 max-w-sm w-full">
+      <div className="flex flex-col items-center text-center pt-14 pb-8 max-w-sm w-full">
         <div className="w-20 h-20 mx-auto mb-7 rounded-[22px] bg-[oklch(0.56_0.12_188)] flex items-center justify-center shadow-lg shadow-[oklch(0.56_0.12_188/0.25)]">
           <svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
             <circle cx="18" cy="18" r="7" fill="white" fillOpacity="0.25" />
@@ -39,7 +58,8 @@ export default function HomePage() {
           Map the silence. Find your quiet.
         </p>
         <p className="text-[15px] text-[oklch(0.48_0.008_248)] leading-relaxed">
-          A crowdsourced noise map built by people like you. Record a short clip anywhere in the city — see where it&apos;s loud, and discover hidden pockets of quiet.
+          Urban noise is a public health problem. Most city noise maps are years out of date.
+          UrbanQuiet lets anyone build a real-time picture of what the city actually sounds like — street by street.
         </p>
 
         <div className="flex flex-col gap-3 w-full mt-8">
@@ -55,6 +75,27 @@ export default function HomePage() {
           >
             Explore Map
           </Link>
+        </div>
+      </div>
+
+      {/* Why it matters */}
+      <div className="w-full max-w-sm pb-6">
+        <h2 className="text-[13px] font-medium text-[oklch(0.48_0.008_248)] uppercase tracking-wider mb-3 px-1">
+          Why it matters
+        </h2>
+        <div className="flex flex-col gap-3">
+          {WHY_CARDS.map((card) => (
+            <div
+              key={card.stat}
+              className="bg-white rounded-[16px] border border-[oklch(0.88_0.004_248)] p-4"
+            >
+              <div className="flex items-baseline gap-2 mb-1">
+                <span className="text-[22px] font-bold text-[oklch(0.46_0.12_188)] leading-none">{card.stat}</span>
+                <span className="text-[13px] font-medium text-[oklch(0.12_0.006_248)]">{card.label}</span>
+              </div>
+              <p className="text-[13px] text-[oklch(0.48_0.008_248)] leading-relaxed">{card.detail}</p>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -86,6 +127,7 @@ export default function HomePage() {
           Microphone access is used only during active recording.
         </p>
       </div>
+
     </div>
   );
 }
