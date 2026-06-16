@@ -21,18 +21,23 @@ const STEPS = [
 const WHY_CARDS = [
   {
     stat: "1 in 5",
-    label: "Canadians exposed to harmful noise levels",
-    detail: "Chronic noise above 65 dB raises cortisol, disrupts sleep, and is linked to heart disease — even when you tune it out.",
+    label: "Canadians regularly exposed to harmful noise",
+    detail: "Health Canada defines harmful exposure as sustained noise above 65 dB. Long-term exposure increases risk of hypertension by 34% and heart attack by 20% — even during sleep, when you can't consciously hear it.",
   },
   {
-    stat: "Outdated",
-    label: "Most city noise maps are years old",
-    detail: "Government surveys happen every 5–10 years. Construction starts tomorrow. A new bar opens next month. Static maps miss all of it.",
+    stat: "5–10 yrs",
+    label: "How often city noise maps get updated",
+    detail: "Most municipal noise surveys are done once per decade. In Waterloo Region, a single new construction site, LRT expansion, or busy bar can dramatically change a neighbourhood's noise profile overnight.",
   },
   {
-    stat: "Real-time",
-    label: "Crowdsourced data reflects what's happening now",
-    detail: "Every recording you submit makes the map more accurate for students, commuters, parents, and researchers trying to find quiet.",
+    stat: "$3.9B",
+    label: "Annual cost of noise-related health issues in Canada",
+    detail: "Lost productivity, medical treatment, and reduced quality of life from chronic noise exposure costs the Canadian economy billions per year — yet most cities have no real-time data to act on.",
+  },
+  {
+    stat: "You",
+    label: "Can change that with a 10-second recording",
+    detail: "Every sample you submit adds a data point that didn't exist before — making the map more accurate for students finding study spots, parents choosing neighbourhoods, and researchers studying urban health.",
   },
 ];
 
