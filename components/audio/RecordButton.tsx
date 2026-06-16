@@ -26,6 +26,7 @@ export default function RecordButton({ onRecordingComplete, onRecordingStart, du
     cancelledRef.current = false;
     setState("recording");
     setCountdown(duration);
+    onRecordingStart?.();
 
     intervalRef.current = setInterval(() => {
       setCountdown((prev) => {

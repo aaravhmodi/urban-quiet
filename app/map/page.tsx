@@ -5,7 +5,6 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { getSamples } from "@/lib/supabase";
 import { computeZones } from "@/lib/zones";
-import { SEED_SAMPLES } from "@/lib/seedData";
 import { NoiseSample, NoiseZone } from "@/types";
 import MapFilters, {
   FilterState,
@@ -44,8 +43,8 @@ export default function MapPage() {
 
   useEffect(() => {
     getSamples()
-      .then((live) => setSamples([...SEED_SAMPLES, ...live]))
-      .catch(() => setSamples(SEED_SAMPLES)) // fall back to seed data if DB unavailable
+      .then(setSamples)
+      .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
 

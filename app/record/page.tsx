@@ -160,7 +160,7 @@ export default function RecordPage() {
       await submitSample({
         latitude: location.lat,
         longitude: location.lng,
-        timestamp: new Date(),
+        timestamp: recordedAt ?? new Date(),
         durationSeconds: duration,
         rms: loudnessResult.rms,
         peak: loudnessResult.peak,
@@ -284,7 +284,7 @@ export default function RecordPage() {
           </SectionRow>
           <SectionRow hasDivider>
             <div className="flex flex-col items-center gap-6 py-4">
-              <RecordButton duration={duration} onRecordingComplete={handleRecordingComplete} />
+              <RecordButton duration={duration} onRecordingComplete={handleRecordingComplete} onRecordingStart={() => setRecordedAt(new Date())} />
               <WaveformDisplay isRecording={isRecording} />
             </div>
           </SectionRow>
@@ -297,7 +297,14 @@ export default function RecordPage() {
           {/* Loudness + baseline comparison */}
           <SectionCard>
             <SectionRow>
-              <div className="text-[13px] text-[oklch(0.48_0.008_248)] font-medium mb-4">Analysis</div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="text-[13px] text-[oklch(0.48_0.008_248)] font-medium">Analysis</div>
+                {recordedAt && (
+                  <div className="text-[12px] text-[oklch(0.62_0.006_248)]">
+                    Recorded at {recordedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </div>
+                )}
+              </div>
               <WaveformDisplay isRecording={false} loudnessResult={loudnessResult} />
               {(() => {
                 const cmp = loudnessVsBaseline(loudnessResult.loudnessScore, baseline);
